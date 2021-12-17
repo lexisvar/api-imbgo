@@ -23,11 +23,11 @@ func main() {
 
 // movie represents data about a record movie.
 type movie struct {
-	ImdbId   string   `json:"imdbid"`
-	Title    string   `json:"title"`
-	Released string   `json:"released"`
-	Rated    string   `json:"rated"`
-	Genres   []string `json:"genres"`
+	ImdbId     string   `json:"imdbid"`
+	Title      string   `json:"title"`
+	Released   string   `json:"released"`
+	ImdbRating string   `json:"rating"`
+	Genres     []string `json:"genres"`
 }
 
 // movies slice to seed record movie data.
@@ -59,12 +59,13 @@ func getMoviesByTitle(c *gin.Context) {
 	}
 
 	if res != nil {
+		c.IndentedJSON(http.StatusOK, res.ImdbRating)
 		var tempMovie = movie{
-			ImdbId:   res.ImdbID,
-			Title:    res.Title,
-			Released: res.Released,
-			Rated:    res.Rated,
-			Genres:   strings.Split(res.Genre, ","), // Convert string to array
+			ImdbId:     res.ImdbID,
+			Title:      res.Title,
+			Released:   res.Released,
+			ImdbRating: res.ImdbRating,
+			Genres:     strings.Split(res.Genre, ","), // Convert string to array
 		}
 
 		movies = append(movies, tempMovie)
