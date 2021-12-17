@@ -37,7 +37,7 @@ Data is stored in memory, data is lost during server restarts.
 
 ## API Definition
 
-*Returns a list of movies
+* Returns a list of movies
 ```
 http://{{server}}/movies/
 
@@ -53,7 +53,7 @@ http://{{server}}/movies/
   ]
 },
 ```
-*Returns a list of movies by Id
+* Returns a list of movies by Id
 ```
 http://{{server}}/movies/tt0328107
 
@@ -69,7 +69,7 @@ http://{{server}}/movies/tt0328107
   ]
 }
 ```
-*Find movie in local storage if is not found then go to de imb API and save
+* Find movie in local storage if is not found then go to de imb API and save
 ```
 http://{{server}}/movies/title/joker
 
@@ -84,8 +84,8 @@ http://{{server}}/movies/title/joker
       "Thriller"
   ]
 }
-
-*Filter by many fields
+```
+* Filter by many fields
 ```
 http://{{server}}/movies/filter?start_release=1995&end_release=2020&genres=Horror&rating=6
 
@@ -104,9 +104,7 @@ http://{{server}}/movies/filter?start_release=1995&end_release=2020&genres=Horro
 ]
 ```
 
-*Delete a movie by id from local storage
+* Delete a movie by id from local storage
 ```
 http://{{server}}/movies/tt2884018
-
-
 ```
