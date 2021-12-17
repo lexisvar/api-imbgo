@@ -2,7 +2,9 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/eefret/gomdb"
 	"github.com/gin-gonic/gin"
@@ -15,6 +17,7 @@ func main() {
 	router.GET("/movies", getMovies)
 	router.GET("/movies/:id", getMovieByID)
 	router.GET("/movies/title/:title", getMoviesByTitle)
+	router.GET("/movies/filter", getMoviesFilter)
 	router.POST("/movies", postMovies)
 	router.DELETE("/movies/:id", deleteMovieByID)
 
@@ -32,6 +35,7 @@ type movie struct {
 
 // movies slice to seed record movie data.
 
+// var movies = []movie{}
 var movies = []movie{}
 
 // getMovies responds with the list of all movies as JSON.
@@ -59,7 +63,6 @@ func getMoviesByTitle(c *gin.Context) {
 	}
 
 	if res != nil {
-		c.IndentedJSON(http.StatusOK, res.ImdbRating)
 		var tempMovie = movie{
 			ImdbId:     res.ImdbID,
 			Title:      res.Title,
@@ -74,6 +77,69 @@ func getMoviesByTitle(c *gin.Context) {
 		return
 	}
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "movie not found"})
+}
+
+// getMovies responds with the list of all movies as JSON.
+func getMoviesFilter(c *gin.Context) {
+	var tempMovies = []movie{}
+	var start_release = c.Query("start_release")
+	var end_release = c.Query("end_release")
+	var rating = c.Query("rating")
+	var genres = c.Query("genres")
+	var option = 0 // for evaluate params
+
+	if start_release == "" && end_release == "" && rating == "" && genres == "" {
+		option = 1 // all params are empty
+	} else if start_release != "" && end_release != "" {
+		option = 2 // range
+	} else if start_release != "" && end_release == "" {
+		option = 3 // movies released same year
+	}
+
+	switch option {
+	case 1:
+		c.IndentedJSON(http.StatusOK, movies)
+		return
+	case 2:
+		for _, m := range movies {
+			if m.Released != "N/A" { // if movie have a release date
+
+				date_realeased, err := time.Parse("2 Jan 2006", m.Released)
+				if err != nil {
+					c.IndentedJSON(http.StatusOK, err)
+					return
+				}
+
+				int_start_release, _ := strconv.Atoi(start_release)
+				int_end_release, _ := strconv.Atoi(end_release)
+				if date_realeased.Year() >= int_start_release && date_realeased.Year() <= int_end_release {
+					tempMovies = append(tempMovies, m)
+				}
+			}
+		}
+		c.IndentedJSON(http.StatusOK, tempMovies)
+		return
+	case 3:
+		for _, m := range movies {
+			if m.Released != "N/A" { // if movie have a release date
+
+				date_realeased, err := time.Parse("2 Jan 2006", m.Released)
+				if err != nil {
+					c.IndentedJSON(http.StatusOK, err)
+					return
+				}
+
+				int_start_release, _ := strconv.Atoi(start_release)
+
+				if date_realeased.Year() == int_start_release {
+					tempMovies = append(tempMovies, m)
+				}
+			}
+		}
+		c.IndentedJSON(http.StatusOK, tempMovies)
+		return
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "movies not found"})
 }
 
 // postMovies adds an movie from JSON received in the request body.
@@ -98,9 +164,9 @@ func getMovieByID(c *gin.Context) {
 
 	// Loop over the list of movies, looking for
 	// an movie whose ID value matches the parameter.
-	for _, a := range movies {
-		if a.ImdbId == id {
-			c.IndentedJSON(http.StatusOK, a)
+	for _, m := range movies {
+		if m.ImdbId == id {
+			c.IndentedJSON(http.StatusOK, m)
 			return
 		}
 	}
