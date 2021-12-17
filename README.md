@@ -84,7 +84,7 @@ http://{{server}}/movies/title/joker
       "Thriller"
   ]
 }
-
+```
 *Filter by many fields
 ```
 http://{{server}}/movies/filter?start_release=1995&end_release=2020&genres=Horror&rating=6
@@ -107,6 +107,4 @@ http://{{server}}/movies/filter?start_release=1995&end_release=2020&genres=Horro
 *Delete a movie by id from local storage
 ```
 http://{{server}}/movies/tt2884018
-
-
 ```
