@@ -32,16 +32,7 @@ type movie struct {
 
 // movies slice to seed record movie data.
 
-var movies = []movie{
-	{
-		ImdbId:   "1",
-		Title:    "Blue Train",
-		Released: "2005",
-		Rated:    "7.4",
-		Genres: []string{"blah",
-			"blah2"},
-	},
-}
+var movies = []movie{}
 
 // getMovies responds with the list of all movies as JSON.
 func getMovies(c *gin.Context) {
@@ -73,7 +64,7 @@ func getMoviesByTitle(c *gin.Context) {
 			Title:    res.Title,
 			Released: res.Released,
 			Rated:    res.Rated,
-			Genres:   strings.Split(res.Genre, ","),
+			Genres:   strings.Split(res.Genre, ","), // Convert string to array
 		}
 
 		movies = append(movies, tempMovie)
