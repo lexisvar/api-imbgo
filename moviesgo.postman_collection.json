@@ -1,0 +1,156 @@
+{
+	"info": {
+		"_postman_id": "597bfbe5-0fb5-42cc-ba13-50447cba4079",
+		"name": "moviesgo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/movies",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server}}/movies/",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"movies",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/movies/:id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server}}/movies/tt0328107",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"movies",
+						"tt0328107"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/movies/titile/:title",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server}}/movies/title/hello",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"movies",
+						"title",
+						"hello"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/movies/filter",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server}}/movies/filter?start_release=1995&end_release=2020&genres=Horror&rating=6",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"movies",
+						"filter"
+					],
+					"query": [
+						{
+							"key": "start_release",
+							"value": "1995",
+							"description": "release year"
+						},
+						{
+							"key": "end_release",
+							"value": "2020",
+							"description": "end range"
+						},
+						{
+							"key": "genres",
+							"value": "Horror"
+						},
+						{
+							"key": "rating",
+							"value": "6",
+							"description": "all movies with rating major that field"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/movies",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"imdbId\": \"1\", \n    \"title\": \"Blue Trasin\", \n    \"released\": \"2005\",\n    \"rated\": \"7.4\", \n    \"genres\": [\n            \"blah\",\n            \"blah2\"\n        ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server}}/movies",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"movies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/movies/:id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"4\",\n    \"title\": \"The Modern Sound of Betty Carter\",\n    \"artist\": \"Betty Carter\",\n    \"price\": 49.99\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server}}/movies/tt2884018",
+					"host": [
+						"{{server}}"
+					],
+					"path": [
+						"movies",
+						"tt2884018"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
