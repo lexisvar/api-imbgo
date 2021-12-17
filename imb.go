@@ -2,9 +2,13 @@ package main
 
 import (
 	"net/http"
+	"strings"
 
+	"github.com/eefret/gomdb"
 	"github.com/gin-gonic/gin"
 )
+
+var api = gomdb.Init("9b41e7cc")
 
 func main() {
 	router := gin.Default()
@@ -22,16 +26,21 @@ type movie struct {
 	ImdbId   string   `json:"imdbid"`
 	Title    string   `json:"title"`
 	Released string   `json:"released"`
-	Rated    string   `json:"artist"`
+	Rated    string   `json:"rated"`
 	Genres   []string `json:"genres"`
 }
 
 // movies slice to seed record movie data.
 
 var movies = []movie{
-	{ImdbId: "1", Title: "Blue Train", Released: "2005", Rated: "7.4", Genres: []string{"blah", "blah2"}},
-	{ImdbId: "2", Title: "Blue Train", Released: "2005", Rated: "7.4"},
-	{ImdbId: "3", Title: "Blue Train", Released: "2005", Rated: "7.4"},
+	{
+		ImdbId:   "1",
+		Title:    "Blue Train",
+		Released: "2005",
+		Rated:    "7.4",
+		Genres: []string{"blah",
+			"blah2"},
+	},
 }
 
 // getMovies responds with the list of all movies as JSON.
@@ -40,23 +49,37 @@ func getMovies(c *gin.Context) {
 }
 
 func getMoviesByTitle(c *gin.Context) {
-	// api := gomdb.Init("9b41e7cc")
-	// query := &gomdb.QueryData{Title: "Macbeth", SearchType: gomdb.MovieSearch}
-	// res, err := api.MovieByTitle(query)
-	// if err != nil {
-	// 	c.IndentedJSON(http.StatusOK, err)
-	// 	return
-	// }
-	// c.IndentedJSON(http.StatusOK, res)
+
 	title := c.Param("title")
 
 	// Loop over the list of movies, looking for
-	// an movie whose ID value matches the parameter.
+	// an movie whose Title value matches the parameter.
 	for _, a := range movies {
 		if a.Title == title {
 			c.IndentedJSON(http.StatusOK, a)
 			return
 		}
+	}
+	query := &gomdb.QueryData{Title: title, SearchType: gomdb.MovieSearch}
+	res, err := api.MovieByTitle(query)
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"message": "movie not found"})
+		return
+	}
+
+	if res != nil {
+		var tempMovie = movie{
+			ImdbId:   res.ImdbID,
+			Title:    res.Title,
+			Released: res.Released,
+			Rated:    res.Rated,
+			Genres:   strings.Split(res.Genre, ","),
+		}
+
+		movies = append(movies, tempMovie)
+
+		c.IndentedJSON(http.StatusOK, tempMovie)
+		return
 	}
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "movie not found"})
 }
