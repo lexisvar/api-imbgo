@@ -89,8 +89,12 @@ http://{{server}}/movies/title/joker
   ]
 }
 ```
+<<<<<<< HEAD
 
 * Filter by many fields
+=======
+*Filter by many fields
+>>>>>>> 60a92d52fb5ffcc41521bccde060de87221bfea7
 ```
 http://{{server}}/movies/filter?start_release=1995&end_release=2020&genres=Horror&rating=6
 
