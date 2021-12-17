@@ -10,6 +10,9 @@ properties as well as movie object in response of the apis:
 - id
 - genres (array of strings)
 
+![movies](img/movies.png?raw=true "Movies") ![movies](img/movies2.png?raw=true "Movies")
+
+
 ## Language
 
 I've used Golang because I want learn it.
