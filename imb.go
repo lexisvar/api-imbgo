@@ -68,7 +68,7 @@ func getMoviesByTitle(c *gin.Context) {
 			Title:      res.Title,
 			Released:   res.Released,
 			ImdbRating: res.ImdbRating,
-			Genres:     strings.Split(res.Genre, ","), // Convert string to array
+			Genres:     strings.Split(strings.ReplaceAll(res.Genre, " ", ""), ","), // Convert string to array
 		}
 
 		movies = append(movies, tempMovie)
@@ -117,8 +117,6 @@ func getMoviesFilter(c *gin.Context) {
 				}
 			}
 		}
-		c.IndentedJSON(http.StatusOK, tempMovies)
-		return
 	case 3:
 		for _, m := range movies {
 			if m.Released != "N/A" { // if movie have a release date
@@ -136,10 +134,48 @@ func getMoviesFilter(c *gin.Context) {
 				}
 			}
 		}
-		c.IndentedJSON(http.StatusOK, tempMovies)
-		return
 	}
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "movies not found"})
+
+	if start_release == "" && end_release == "" { // if release was not sent
+		tempMovies = movies
+	}
+
+	// Rating and Genres filters
+
+	var tempMovies2 = []movie{}
+
+	if genres != "" { // Genres
+		for _, m := range tempMovies {
+			if !contains(m.Genres, genres) {
+				tempMovies2 = append(tempMovies2, m)
+			}
+		}
+
+		if len(tempMovies2) > 0 {
+			tempMovies = tempMovies2
+			tempMovies2 = []movie{}
+		} else {
+			tempMovies = []movie{}
+		}
+	}
+
+	if rating != "" { // Genres
+		for _, m := range tempMovies {
+
+			if m.ImdbRating >= rating {
+				tempMovies2 = append(tempMovies2, m)
+			}
+		}
+
+		if len(tempMovies2) > 0 {
+			tempMovies = tempMovies2
+			tempMovies2 = []movie{}
+		} else {
+			tempMovies = []movie{}
+		}
+	}
+
+	c.IndentedJSON(http.StatusOK, tempMovies)
 }
 
 // postMovies adds an movie from JSON received in the request body.
@@ -178,8 +214,8 @@ func getMovieByID(c *gin.Context) {
 func deleteMovieByID(c *gin.Context) {
 	id := c.Param("id")
 
-	for i, a := range movies {
-		if a.ImdbId == id {
+	for i, m := range movies {
+		if m.ImdbId == id {
 			movies = append(movies[:i], movies[i+1:]...)
 			c.IndentedJSON(http.StatusOK, gin.H{"message": "movie deleted"})
 			return
@@ -187,4 +223,15 @@ func deleteMovieByID(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "movie not found"})
+}
+
+// functions internal
+func contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+
+	return false
 }
