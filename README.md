@@ -69,6 +69,7 @@ http://{{server}}/movies/tt0328107
   ]
 }
 ```
+
 * Find movie in local storage if is not found then go to de imb API and save
 ```
 http://{{server}}/movies/title/joker
@@ -85,6 +86,7 @@ http://{{server}}/movies/title/joker
   ]
 }
 ```
+
 * Filter by many fields
 ```
 http://{{server}}/movies/filter?start_release=1995&end_release=2020&genres=Horror&rating=6
