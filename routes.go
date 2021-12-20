@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/eefret/gomdb"
@@ -19,6 +20,11 @@ func init() {
 	router.DELETE("/movies/:id", deleteMovieByID)
 }
 
+type cache struct {
+	sync.Mutex
+	movies []movie
+}
+
 // movie represents data about a record movie.
 type movie struct {
 	ImdbId     string   `json:"imdbid"`
@@ -30,12 +36,12 @@ type movie struct {
 
 // movies slice to seed record movie data.
 
-// var movies = []movie{}
-var movies = []movie{}
+// var movies = cache{}
+var movies = cache{}
 
 // getMovies responds with the list of all movies as JSON.
 func getMovies(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, movies)
+	c.IndentedJSON(http.StatusOK, movies.movies)
 }
 
 func getMoviesByTitle(c *gin.Context) {
@@ -44,7 +50,7 @@ func getMoviesByTitle(c *gin.Context) {
 
 	// Loop over the list of movies, looking for
 	// an movie whose Title value matches the parameter.
-	for _, a := range movies {
+	for _, a := range movies.movies {
 		if a.Title == title {
 			c.IndentedJSON(http.StatusOK, a)
 			return
@@ -66,7 +72,9 @@ func getMoviesByTitle(c *gin.Context) {
 			Genres:     strings.Split(strings.ReplaceAll(res.Genre, " ", ""), ","), // Convert string to array
 		}
 
-		movies = append(movies, tempMovie)
+		movies.Lock()
+		movies.movies = append(movies.movies, tempMovie)
+		movies.Unlock()
 
 		c.IndentedJSON(http.StatusOK, tempMovie)
 		return
@@ -93,10 +101,10 @@ func getMoviesFilter(c *gin.Context) {
 
 	switch option {
 	case 1:
-		c.IndentedJSON(http.StatusOK, movies)
+		c.IndentedJSON(http.StatusOK, movies.movies)
 		return
 	case 2:
-		for _, m := range movies {
+		for _, m := range movies.movies {
 			if m.Released != "N/A" { // if movie have a release date
 
 				date_realeased, err := time.Parse("2 Jan 2006", m.Released)
@@ -113,7 +121,7 @@ func getMoviesFilter(c *gin.Context) {
 			}
 		}
 	case 3:
-		for _, m := range movies {
+		for _, m := range movies.movies {
 			if m.Released != "N/A" { // if movie have a release date
 
 				date_realeased, err := time.Parse("2 Jan 2006", m.Released)
@@ -132,7 +140,7 @@ func getMoviesFilter(c *gin.Context) {
 	}
 
 	if start_release == "" && end_release == "" { // if release was not sent
-		tempMovies = movies
+		tempMovies = movies.movies
 	}
 
 	// Rating and Genres filters
@@ -184,7 +192,9 @@ func postMovies(c *gin.Context) {
 	}
 
 	// Add the new movie to the slice.
-	movies = append(movies, newMovie)
+	movies.Lock()
+	movies.movies = append(movies.movies, newMovie)
+	movies.Unlock()
 	c.IndentedJSON(http.StatusCreated, newMovie)
 }
 
@@ -195,7 +205,7 @@ func getMovieByID(c *gin.Context) {
 
 	// Loop over the list of movies, looking for
 	// an movie whose ID value matches the parameter.
-	for _, m := range movies {
+	for _, m := range movies.movies {
 		if m.ImdbId == id {
 			c.IndentedJSON(http.StatusOK, m)
 			return
@@ -209,9 +219,11 @@ func getMovieByID(c *gin.Context) {
 func deleteMovieByID(c *gin.Context) {
 	id := c.Param("id")
 
-	for i, m := range movies {
+	for i, m := range movies.movies {
 		if m.ImdbId == id {
-			movies = append(movies[:i], movies[i+1:]...)
+			movies.Lock()
+			movies.movies = append(movies.movies[:i], movies.movies[i+1:]...)
+			movies.Unlock()
 			c.IndentedJSON(http.StatusOK, gin.H{"message": "movie deleted"})
 			return
 		}
