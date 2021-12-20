@@ -1,4 +1,4 @@
-module lexisvar/imb
+module github.com/lexisvar/api-imbgo
 
 go 1.17
 
