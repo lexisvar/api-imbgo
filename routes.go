@@ -149,7 +149,7 @@ func getMoviesFilter(c *gin.Context) {
 
 	if genres != "" { // Genres
 		for _, m := range tempMovies {
-			if !contains(m.Genres, genres) {
+			if contains(m.Genres, genres) {
 				tempMovies2 = append(tempMovies2, m)
 			}
 		}
